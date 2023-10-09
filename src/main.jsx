@@ -21,7 +21,10 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>,
+ 
+  <RouterProvider router={router}/>
+
 )
+
+  // <React.StrictMode>
+  // useStrict te força a fazer declarações, começa a forçar a usar js no tipo typescript
