@@ -7,7 +7,6 @@ export default function App() {
 
   return (
     <>
-      <h1 className={style.titulo}>APP - Componente principal!</h1>
       <div className={style.container}>
         {/* Iniciando a área do cabeçalho */}
         <Cabecalho />
