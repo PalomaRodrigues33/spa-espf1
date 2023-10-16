@@ -1,0 +1,138 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom'
+
+export default function EditarProdutos() {
+
+    const {id} = useParams();
+    const navigation = useNavigate()
+    //age diretamente no request gerado um cabecalho com varias informações
+    //ele intercepta apenas a informação id, destructuring o request 
+
+    document.title = "Editar Produtos " + id;
+
+    
+    const[produto,setProduto] = useState({
+      id:id,
+      nome:'',
+      desc:'',
+      preco:''
+    });
+
+
+    //Criar uma estratégia para recuperar o produto na lista
+    // Utilizando o id
+    // const produtoRecuperadoPorId = ListaProduto.filter(item => item.id == parseInt(id));
+    // const produtoRecuperadoPorId = ListaProduto.filter(item => item.id == parseInt(id))[0];
+
+
+
+    //Criar uma estratégia para recuperar o produto da API-JSON com fetch, utilizando GET:
+
+    useEffect(()=>{
+      
+      fetch(`http://localhost:5000/produtos/${id}`)
+      .then((response)=> response.json())
+      .then((response)=> setProduto(response))
+      .catch(error=> console.log(error));
+
+    },[id]);
+
+    //usar o id para monitorar o id, ver se mudou para ai sim executar o codigo que esta aqui dentro
+
+    const handleChange = (e)=>{
+
+      //Destructuring
+      const {name,value} = e.target;
+
+      //Setando os dados diretamente no objeto atravé de SPREAD
+      setProduto({...produto,[name]:value});
+      
+    }
+
+    //Versao 18.4, eles incluiram um loop a  mais na funcao useEffect,ele executa duas vezes so para ter certeza
+    //para isso precisa de uma condição, precisa estar no strict mode 
+
+
+
+    const handleSubmit = (e) =>{
+      e.preventDefault();
+   
+        fetch(`http://localhost:5000/produtos/${id}`,{
+          method:"PUT",
+          headers:{
+            "Content-Type":"application/json"
+          },
+          body: JSON.stringify(produto)
+        })
+        .then((response)=> console.log("Dados alterado com sucesso - STATUS CODE : " + response.status))
+        .catch(error=> console.log(error));
+
+        //Redirect
+        navigation("/produtos");
+    }
+
+
+
+    return (
+      <div>
+          <h1>Editar Produtos</h1>
+            <div>
+              <form onSubmit={handleSubmit}>
+                <fieldset>
+                  <legend>Produto Selecionado</legend>
+                  <div>
+                    <label htmlFor="">Nome:</label>
+                    <input type="text" name="nome" placeholder="Digite o nome do Produto." value={produto.nome} onChange={handleChange}/>
+                  </div>
+                  <div>
+                    <label htmlFor="">Descrição:</label>
+                    <input type="text" name="desc" placeholder="Digite a descrição do Produto." value={produto.desc} onChange={handleChange}/>
+                  </div>
+                  <div>
+                    <label htmlFor="">Preço:</label>
+                    <input type="text" name="preco" placeholder="Digite o preço do Produto." value={produto.preco} onChange={handleChange}/>
+                  </div>
+                  <div>
+                    <button>EDITAR</button>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+  
+      </div>
+    )
+  }
+  
+  
+
+//  onChange={(e)=> setProduto(e.target.value)}
+//serve para pegar o valor e poder editar tranquilamente ele muda o valor dele mesmo e vai mandando para atualizar
+// Primeira forma de input com useState 
+
+
+
+// const handleChange = (e)=>{
+
+//   //Destructuring
+//   const {name,value} = e.target; //Nosso target eh o input, tem varias propriedades no input, mas eu so quero o name e o value
+
+
+//   if(name == "nome"){
+//     setProduto({[name]:value,"desc":"","preco":""});
+//   }else if(name == "desc"){
+//     setProduto({"nome":"",[name]:value,"preco":""});
+//   }else if(name == "preco"){
+//     setProduto({"nome":"","desc":"",[name]:value});
+//   }
+  
+
+// }
+
+
+// CRUD 
+// POST GET PUT DELETE 
+
+//update eh o put 
+//Sao os 4 metodos do http o post e o get ficam na superficie
+
+//Metodo post para inserir e gera automatico um id
