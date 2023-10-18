@@ -17,40 +17,45 @@ export default function Produtos() {
   //useState(valor inicial) -> retorna um array [valor, função]
 
   const [listaProdutosApi, setlistaProdutosApi] =  useState([]);
-
+  const [open, setOpen] = useState(false)
+  const [prodID, setProdID] = useState(0)
   
-  useEffect(()=>{
-    
+  useEffect(
+  ()=>{
   //Realizando o Request 
-  fetch("http://localhost:5000/produtos")
+    fetch("http://localhost:5000/produtos")
   //Recebendo o Response e transformando em json
   //Tudo que viaja através do http é serializadp, eh textificado, transformado em bytes, então ele 
 
-  .then((response)=> response.json())
+    .then((response)=> response.json())
 
   //Exibindo os dados no console
-  .then((response)=> setlistaProdutosApi(response))
+    .then((response)=> setlistaProdutosApi(response))
 
-
-  .catch(error=> console.log(error))
+    .catch(error=> console.log(error))
 
   //precisa ser convertido pra json, ele sai de string e voltar a ser json
   // Devemos fazer isso com qualquer dado que colocamos em http, tudo que coloca no http ele vira text, saindo ele deve ser convertido de volta
-
-    
-  },[])
+  },[open])
 
   //controla o fluxo de execução dependendo do escopo que determinamos
-  //escopo esse que nesse caso fará executar apenas umavez
+  //escopo esse que nesse caso fará executar apenas uma vez
 
-  
-  const [open, setOpen] = useState(false)
+
+  //Criação da função para deletar itens 
+  const handleDelete = (id)=>{
+    fetch(`http://localhost:5000/produtos/${id}`, {method: `delete`})
+    .then(()=> (window.location = `/produtos`))
+    .catch((error)=> console.log(error))
+  }
+
+
 
   return (
     <div>
       <h1>Produtos</h1>
 
-      <ModalAction open={open} setOpen={setOpen}/>
+      {open ? <ModalAction open={open} id={prodID} setOpen={setOpen} /> : ""}
 
       <button onClick={()=> setOpen(true)}>OPEN-MODAL</button>
 
@@ -62,6 +67,7 @@ export default function Produtos() {
             <th>DESCRIÇÃO</th>
             <th>PREÇO</th>
             <th>EDITAR</th>
+            <th>EXCLUIR</th>
           </tr>
         </thead>
 
@@ -73,6 +79,9 @@ export default function Produtos() {
               <td>{item.desc}</td>
               <td>{item.preco}</td>
               <td><Link to={`/editar/produtos/${item.id}`}> <Editar/> </Link> </td>
+              <td>
+                <button onClick={handleDelete.bind(this, item.id)}>Deletar</button>
+              </td>
             </tr>
           ))}
         </tbody>
